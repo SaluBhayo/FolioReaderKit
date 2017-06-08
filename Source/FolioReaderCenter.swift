@@ -246,6 +246,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         let closeIcon = UIImage(readerImageNamed: "icon-navbar-close")?.ignoreSystemTint(withConfiguration: self.readerConfig)
         let tocIcon = UIImage(readerImageNamed: "icon-navbar-toc")?.ignoreSystemTint(withConfiguration: self.readerConfig)
         let fontIcon = UIImage(readerImageNamed: "icon-navbar-font")?.ignoreSystemTint(withConfiguration: self.readerConfig)
+        let iconBookmark = UIImage(readerImageNamed: "icon-navbar-bookmark")?.ignoreSystemTint(withConfiguration: self.readerConfig)
         let space = 70 as CGFloat
 
         let menu = UIBarButtonItem(image: closeIcon, style: .plain, target: self, action:#selector(closeReader(_:)))
@@ -258,11 +259,15 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         if (self.readerConfig.allowSharing == true) {
             rightBarIcons.append(UIBarButtonItem(image: shareIcon, style: .plain, target: self, action:#selector(shareChapter(_:))))
         }
+        
+        //TODO: Check if already bookmarked (refresh Bookmark icon with filled)
+        rightBarIcons.append(UIBarButtonItem(image: iconBookmark, style: .plain, target: self, action:#selector(bookmarkPage(_:))))
 
         if (self.book.hasAudio() == true || self.readerConfig.enableTTS == true) {
             rightBarIcons.append(UIBarButtonItem(image: audioIcon, style: .plain, target: self, action:#selector(presentPlayerMenu(_:))))
         }
 
+        
         let font = UIBarButtonItem(image: fontIcon, style: .plain, target: self, action: #selector(presentFontsMenu))
         font.width = space
 
@@ -1113,11 +1118,13 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
 
         let chapter = FolioReaderChapterList(folioReader: folioReader, readerConfig: readerConfig, book: book, delegate: self)
         let highlight = FolioReaderHighlightList(folioReader: folioReader, readerConfig: readerConfig)
+        let bookmarks = FolioReaderHighlightList(folioReader: folioReader, readerConfig: readerConfig)
         let pageController = PageViewController(folioReader: folioReader, readerConfig: readerConfig)
 
         pageController.viewControllerOne = chapter
         pageController.viewControllerTwo = highlight
-        pageController.segmentedControlItems = [readerConfig.localizedContentsTitle, readerConfig.localizedHighlightsTitle]
+        pageController.viewControllerThree = bookmarks
+        pageController.segmentedControlItems = [readerConfig.localizedContentsTitle, readerConfig.localizedHighlightsTitle, readerConfig.localizedBookmarksTitle]
 
         let nav = UINavigationController(rootViewController: pageController)
         present(nav, animated: true, completion: nil)
@@ -1167,6 +1174,50 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         present(menu, animated: true, completion: nil)
     }
 
+    /*
+     Boomark Page
+     */
+
+    
+    func bookmarkPage(_ sender: UIBarButtonItem?) {
+//        let highlightAndReturn = js("highlightString('\(HighlightStyle.classForStyle(self.folioReader.currentHighlightStyle))')")
+//        let jsonData = highlightAndReturn?.data(using: String.Encoding.utf8)
+        
+        do {
+//            let json = try JSONSerialization.jsonObject(with: jsonData!, options: []) as! NSArray
+//            let dic = json.firstObject as! [String: String]
+//            let rect = CGRectFromString(dic["rect"]!)
+//            guard let startOffset = dic["startOffset"] else {
+//                return
+//            }
+//            guard let endOffset = dic["endOffset"] else {
+//                return
+//            }
+//            
+//            createMenu(options: true)
+//            setMenuVisible(true, andRect: rect)
+//            
+//            // Persist
+//            guard
+//                let html = js("getHTML()"),
+//                let identifier = dic["id"],
+//                let bookId = (self.book.name as? NSString)?.deletingPathExtension else {
+//                    return
+//            }
+//
+            let pageNumber = folioReader.readerCenter?.currentPageNumber ?? 0
+            print("Header Number is ",pageNumber)
+            print("Page Number is ",self.pageIndicatorView?.currentPage)
+//            let match = Highlight.MatchingHighlight(text: html, id: identifier, startOffset: startOffset, endOffset: endOffset, bookId: bookId, currentPage: pageNumber)
+//            let highlight = Highlight.matchHighlight(match)
+//            highlight?.persist(withConfiguration: self.readerConfig)
+            
+        } catch {
+            print("Could not receive JSON")
+        }
+    }
+
+    
     /**
      Present Quote Share
      */
